@@ -1,0 +1,20 @@
+main:
+  - title: "Home"
+    url: /
+  - title: "Prezzi"
+    url: /#pricing
+  - title: "Blog"
+    url: /blog/
+    children:
+      - title: "Tecnica"
+        url: /categories/#tecnica
+      - title: "Fashion"
+        url: /categories/#fashion
+      - title: "Mauritius"
+        url: /categories/#mauritius
+  - title: "Shop"
+    url: /shop/
+  - title: "About"
+    url: /about/
+  - title: "Changelog"
+    url: /changelog/

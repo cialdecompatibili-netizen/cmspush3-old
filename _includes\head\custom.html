@@ -1,0 +1,546 @@
+{% assign t = site.data.tema %}
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@300;400;600;700&family=Playfair+Display:wght@400;600;700&family=Lora:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+:root {
+  --t-accent:      {{ t.accent      | default: '#6c63ff' }};
+  --t-accent-dark: {{ t.accent_dark | default: '#5a52e0' }};
+  --t-nav-bg:      {{ t.nav_bg      | default: '#ffffff' }};
+  --t-nav-text:    {{ t.nav_text    | default: '#111111' }};
+  --t-nav-hover:   {{ t.nav_hover   | default: '#555555' }};
+  --t-body-bg:     {{ t.body_bg     | default: '#ffffff' }};
+  --t-text:        {{ t.text        | default: '#3a3a3a' }};
+  --t-link:        {{ t.link        | default: '#6c63ff' }};
+  --t-font:        {{ t.font        | default: "'Inter', -apple-system, sans-serif" }};
+  --t-radius:      {{ t.radius      | default: '10px' }};
+  --t-font-scale:  {{ t.font_scale  | default: '1' }};
+}
+body, .page__content, .greedy-nav, .page__footer { font-family: var(--t-font) !important; }
+body { font-size: calc(1rem * var(--t-font-scale)); }
+</style>
+<!-- critical-css: inline — zero FOUC su navbar e footer -->
+<style>
+.masthead { border-bottom: 1px solid #e8e8e8 !important; box-shadow: none !important; }
+.greedy-nav { background: var(--t-nav-bg) !important; box-shadow: none !important; border-bottom: none !important; }
+.greedy-nav a.site-title, .greedy-nav .visible-links a { color: var(--t-nav-text) !important; }
+.greedy-nav .visible-links a:hover { color: var(--t-nav-hover) !important; }
+.greedy-nav button { background: transparent !important; color: var(--t-nav-text) !important; }
+.page__footer { background: var(--t-body-bg) !important; border-top: 1px solid #e8e8e8 !important; box-shadow: none !important; margin-top: 0; }
+.page__footer footer, .page__footer-follow, .page__footer-copyright { background: var(--t-body-bg) !important; }
+.page__footer-follow ul li, .page__footer-follow ul li a, .page__footer-copyright a, .page__footer-copyright { color: #888 !important; }
+.page__footer-follow ul li a:hover, .page__footer-copyright a:hover { color: var(--t-nav-text) !important; text-decoration: none; }
+/* FIX bottoni shop */
+.page__content button.sp-btn-cart, button.sp-btn-cart { display:inline-flex !important; align-items:center !important; justify-content:center !important; flex:1 !important; padding:12px 20px !important; background:var(--t-accent) !important; color:#fff !important; border:none !important; border-radius:var(--t-radius, 10px) !important; font-size:15px !important; font-weight:700 !important; cursor:pointer !important; letter-spacing:.3px !important; visibility:visible !important; opacity:1 !important; height:auto !important; width:auto !important; min-width:0 !important; line-height:1.4 !important; }
+.page__content button.sp-btn-cart:hover, button.sp-btn-cart:hover { background: var(--t-accent-dark) !important; color: #fff !important; }
+.page__content button.sp-btn-wish, button.sp-btn-wish { display:inline-flex !important; align-items:center !important; justify-content:center !important; width:46px !important; height:46px !important; border:1.5px solid #ddd !important; border-radius:var(--t-radius, 10px) !important; background:#fff !important; cursor:pointer !important; font-size:1.3em !important; color:#e74c3c !important; visibility:visible !important; }
+.page__content .sp-qty button, .sp-qty button { display:inline-flex !important; align-items:center !important; justify-content:center !important; width:36px !important; height:40px !important; border:none !important; background:#fff !important; font-size:1.2em !important; cursor:pointer !important; color:#333 !important; visibility:visible !important; }
+/* ICONA CARRELLO NAVBAR */
+.cart-nav-btn { display:inline-flex !important; align-items:center; gap:4px; background:none !important; border:none !important; cursor:pointer; color:var(--t-nav-text) !important; font-size:15px !important; font-weight:600; text-decoration:none !important; padding:0 8px !important; position:relative; line-height:1; }
+.cart-nav-btn:hover { color: var(--t-accent) !important; }
+.cart-nav-badge {
+  background: #e74c3c;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 800;
+  border-radius: 50%;
+  min-width: 16px;
+  height: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 3px;
+  line-height: 1;
+  position: absolute;
+  top: -6px;
+  right: -2px;
+}
+
+/* DROPDOWN SHOP */
+.has-dropdown { position: relative; }
+.has-dropdown > a::after { content: " ▾"; font-size: 10px; opacity: .6; }
+.dropdown-menu {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background: #fff;
+  border: 1.5px solid #eee;
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0,0,0,.10);
+  min-width: 220px;
+  z-index: 9999;
+  padding: 6px 0;
+}
+.has-dropdown:hover .dropdown-menu { display: block; }
+.dropdown-menu a {
+  display: block;
+  padding: 8px 16px;
+  font-size: 13px;
+  color: #333 !important;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.dropdown-menu a:hover { background: #f5f5ff; color: #6c63ff !important; }
+.dropdown-menu .dropdown-sep {
+  border-top: 1px solid #eee;
+  margin: 4px 0;
+}
+.dropdown-menu .dropdown-label {
+  padding: 6px 16px 2px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .8px;
+  color: #bbb;
+}
+
+/* BOTTONE TORNA SU */
+#back-to-top-btn {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: var(--t-accent);
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  box-shadow: 0 4px 14px rgba(0,0,0,.18);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(12px);
+  transition: opacity .25s, transform .25s, background .2s;
+  z-index: 9998;
+}
+#back-to-top-btn.visible { opacity: 1; visibility: visible; transform: translateY(0); }
+#back-to-top-btn:hover { background: var(--t-accent-dark); }
+@media (max-width: 600px) {
+  #back-to-top-btn { bottom: 16px; right: 16px; width: 42px; height: 42px; font-size: 18px; }
+}
+
+/* IMMAGINE ARTICOLO — dentro il box, non full-width in cima (fix 2026-07-04) */
+.page__hero { display: none !important; }
+.article-inline-meta-img {
+  display: block;
+  max-width: 260px;
+  width: 100%;
+  height: auto;
+  border-radius: var(--t-radius, 10px);
+  box-shadow: 0 2px 10px rgba(0,0,0,.10);
+  float: right;
+  margin: 4px 0 12px 20px;
+}
+.article-inline-caption {
+  display: block;
+  font-size: 12px;
+  color: #999;
+  text-align: center;
+  margin-top: 6px;
+  float: right;
+  max-width: 260px;
+  clear: right;
+}
+@media (max-width: 600px) {
+  .article-inline-meta-img, .article-inline-caption { float: none; max-width: 100%; margin: 12px 0; }
+}
+.page__meta-category a {
+  color: var(--t-accent) !important;
+  text-decoration: none;
+  font-weight: 600;
+}
+.page__meta-category a:hover { text-decoration: underline; }
+
+/* INDICE AUTOMATICO (stile Wikipedia, generato dagli h2 dell'articolo) */
+.article-auto-toc {
+  background: #f8f8fb;
+  border: 1px solid #e8e8ee;
+  border-radius: var(--t-radius, 10px);
+  padding: 16px 22px;
+  margin: 18px 0 26px 0;
+  display: inline-block;
+  max-width: 100%;
+}
+.article-auto-toc__title {
+  font-weight: 700;
+  font-size: 14px;
+  margin-bottom: 8px;
+  color: var(--t-text, #333);
+}
+.article-auto-toc ol {
+  margin: 0;
+  padding-left: 20px;
+  counter-reset: toc-counter;
+}
+.article-auto-toc li {
+  margin: 4px 0;
+  font-size: 14px;
+}
+.article-auto-toc a {
+  color: var(--t-link, #6c63ff) !important;
+  text-decoration: none;
+}
+.article-auto-toc a:hover { text-decoration: underline; }
+
+/* DROPDOWN AUTOMATICO menu top (masthead) per voci con sotto-menu (2026-09-10) */
+.masthead__menu-item.has-cp3-children { position: relative; display: flex; align-items: center; }
+.cp3-submenu-toggle {
+  background: none; border: none; cursor: pointer; padding: 4px 6px;
+  display: inline-flex; align-items: center; justify-content: center;
+  color: inherit; line-height: 1;
+}
+.cp3-submenu-arrow { transition: transform .2s ease; }
+.masthead__menu-item.has-cp3-children.cp3-open .cp3-submenu-arrow { transform: rotate(180deg); }
+.cp3-submenu {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background: #fff;
+  border: 1.5px solid #eee;
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0,0,0,.10);
+  min-width: 180px;
+  z-index: 9999;
+  padding: 6px 0;
+  margin: 0;
+  list-style: none;
+}
+.masthead__menu-item.has-cp3-children.cp3-open .cp3-submenu { display: block; }
+.cp3-submenu li { margin: 0; }
+.cp3-submenu a {
+  display: block;
+  padding: 8px 16px;
+  font-size: 13px;
+  color: #333 !important;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.cp3-submenu a:hover { background: #f5f5ff; color: var(--t-accent, #6c63ff) !important; }
+</style>
+
+{% if site.integrations.ga4.enabled and site.integrations.ga4.id != "" %}
+<script async src="https://www.googletagmanager.com/gtag/js?id={{ site.integrations.ga4.id }}"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','{{ site.integrations.ga4.id }}');</script>
+{% endif %}
+
+{% if site.integrations.search_console.enabled and site.integrations.search_console.verification != "" %}
+<meta name="google-site-verification" content="{{ site.integrations.search_console.verification }}" />
+{% endif %}
+
+{% if site.integrations.meta_pixel.enabled and site.integrations.meta_pixel.id != "" %}
+<script>!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');fbq('init','{{ site.integrations.meta_pixel.id }}');fbq('track','PageView');</script>
+{% endif %}
+
+{% if site.integrations.hotjar.enabled and site.integrations.hotjar.id != "" %}
+<script>(function(h,o,t,j,a,r){h.hj=h.hj||function(){(h.hj.q=h.hj.q||[]).push(arguments)};h._hjSettings={hjid:{{ site.integrations.hotjar.id }},hjsv:6};a=o.getElementsByTagName('head')[0];r=o.createElement('script');r.async=1;r.src=t+h._hjSettings.hjid+j+h._hjSettings.hjsv;a.appendChild(r)})(window,document,'https://static.hotjar.com/c/hotjar-','.js?sv=');</script>
+{% endif %}
+
+<script>
+// BASE rilevato dinamicamente dall'URL — identico a detectRepo() dell'admin.
+// Funziona su qualsiasi repo senza toccare _config.yml.
+// Es: pippo.github.io/miosito/ → BASE = '/miosito'
+// Es: pippo.github.io/ → BASE = ''
+(function(){
+  var p = location.pathname; // es. /miosito/shop/carrello/
+  var parts = p.split('/').filter(Boolean); // ['miosito','shop','carrello']
+  var h = location.hostname;
+  var isGhPages = /\.github\.io$/.test(h);
+  // Se github.io e il primo segmento non è una pagina interna conosciuta → è il repo
+  var knownRoots = ['admin','shop','blog','_pages','assets'];
+  window.SITE_BASE = (isGhPages && parts.length > 0 && knownRoots.indexOf(parts[0]) === -1)
+    ? '/' + parts[0]
+    : '';
+})();
+
+document.addEventListener('DOMContentLoaded', function(){
+  var BASE = window.SITE_BASE;
+
+  // --- ICONA CARRELLO nella navbar ---
+  function getCartCount() {
+    try {
+      var CART_KEY = (window.SITE_BASE || 'default') + '_cart';
+      var cart = JSON.parse(sessionStorage.getItem(CART_KEY) || '[]');
+      return cart.reduce(function(s,i){ return s + (i.qty||1); }, 0);
+    } catch(e){ return 0; }
+  }
+  function renderCartIcon() {
+    var count = getCartCount();
+    var existing = document.getElementById('cart-nav-icon');
+    if (existing) {
+      var badge = existing.querySelector('.cart-nav-badge');
+      if (count > 0) {
+        badge.textContent = count;
+        badge.style.display = 'inline-flex';
+      } else {
+        badge.style.display = 'none';
+      }
+      return;
+    }
+    // Inserisce prima del bottone search
+    var searchBtn = document.querySelector('.search__toggle');
+    if (!searchBtn) return;
+    var a = document.createElement('a');
+    a.id = 'cart-nav-icon';
+    a.href = BASE + '/shop/carrello/';
+    a.className = 'cart-nav-btn';
+    a.title = 'Carrello';
+    a.innerHTML = '🛒<span class="cart-nav-badge" style="display:' + (count > 0 ? 'inline-flex' : 'none') + '">' + count + '</span>';
+    searchBtn.parentNode.insertBefore(a, searchBtn);
+  }
+  renderCartIcon();
+  // Aggiorna badge ogni volta che sessionStorage cambia (cross-tab)
+  window.addEventListener('storage', renderCartIcon);
+  // Aggiorna ogni 2s per catturare aggiunte nella stessa tab
+  setInterval(renderCartIcon, 2000);
+
+  // --- SPOSTA COPYRIGHT DOPO SOCIAL ---
+  var custom = document.querySelector('.page__footer-custom');
+  var follow = document.querySelector('.page__footer-follow');
+  if (custom && follow && follow.nextSibling !== custom) {
+    follow.parentNode.insertBefore(custom, follow.nextSibling);
+  }
+
+  // --- BOTTONE TORNA SU ---
+  var btn = document.createElement('button');
+  btn.id = 'back-to-top-btn';
+  btn.setAttribute('aria-label', 'Torna su');
+  btn.innerHTML = '&uarr;';
+  document.body.appendChild(btn);
+
+  function toggleBackToTop() {
+    if (window.scrollY > 400) {
+      btn.classList.add('visible');
+    } else {
+      btn.classList.remove('visible');
+    }
+  }
+  btn.addEventListener('click', function(){
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+  window.addEventListener('scroll', toggleBackToTop);
+  toggleBackToTop();
+
+  // --- IMMAGINE ARTICOLO: float a destra sul primo paragrafo, stile Wikipedia (fix 2026-07-04) ---
+  (function(){
+    var hero = document.querySelector('.page__hero');
+    var content = document.querySelector('.page__content');
+    if (!hero || !content) return; // pagina senza immagine o senza contenuto, niente da fare
+
+    var img = hero.querySelector('.page__hero-image');
+    var caption = hero.querySelector('.page__hero-caption');
+    if (!img) return;
+
+    var wrap = document.createElement('div');
+    var small = document.createElement('img');
+    small.src = img.src;
+    small.alt = img.alt;
+    small.className = 'article-inline-meta-img';
+    wrap.appendChild(small);
+
+    if (caption) {
+      var cap = document.createElement('span');
+      cap.className = 'article-inline-caption';
+      cap.textContent = caption.textContent.trim();
+      wrap.appendChild(cap);
+    }
+
+    // Inserisce l'immagine (con float:right via CSS) subito prima del primo paragrafo del contenuto
+    var firstP = content.querySelector('p, h2');
+    if (firstP) {
+      content.insertBefore(wrap, firstP);
+    } else {
+      content.insertBefore(wrap, content.firstChild);
+    }
+  })();
+
+  // --- CATEGORIA cliccabile accanto a "readtime" nel box meta ---
+  (function(){
+    var meta = document.querySelector('.page__meta');
+    if (!meta) return;
+    var catLink = document.querySelector('.page__taxonomy a.page__taxonomy-item');
+    if (!catLink) return; // pagina senza categoria (es. prodotti)
+    var span = document.createElement('span');
+    span.className = 'page__meta-category';
+    span.innerHTML = ' · <a href="' + catLink.getAttribute('href') + '"><i class="fas fa-fw fa-folder" aria-hidden="true"></i> ' + catLink.textContent.trim() + '</a>';
+    meta.appendChild(span);
+  })();
+
+  // --- TRADUZIONE "X minute read" -> "X minuto/i di lettura" (2026-07-04) ---
+  (function(){
+    var rt = document.querySelector('.page__meta-readtime');
+    if (!rt) return;
+    var testo = rt.textContent;
+    if (/less than 1 minute read/i.test(testo)) {
+      testo = testo.replace(/less than 1 minute read/i, 'meno di 1 minuto di lettura');
+    } else {
+      var match = testo.match(/(\d+)\s*minute read/i);
+      if (match) {
+        var n = parseInt(match[1], 10);
+        var nuovoTesto = n === 1 ? '1 minuto di lettura' : n + ' minuti di lettura';
+        testo = testo.replace(/\d+\s*minute read/i, nuovoTesto);
+      }
+    }
+    var icon = rt.querySelector('i');
+    rt.textContent = testo.trim();
+    if (icon) rt.insertBefore(icon, rt.firstChild);
+  })();
+
+  // --- TRADUZIONE resto UI in italiano (2026-07-04) ---
+  (function(){
+    function traduciTesto(selettore, sostituzioni) {
+      document.querySelectorAll(selettore).forEach(function(el){
+        sostituzioni.forEach(function(pair){
+          if (el.childNodes.length) {
+            el.childNodes.forEach(function(node){
+              if (node.nodeType === 3 && node.textContent.indexOf(pair[0]) !== -1) {
+                node.textContent = node.textContent.replace(pair[0], pair[1]);
+              }
+            });
+          }
+        });
+      });
+    }
+
+    // Categories: / Updated:
+    traduciTesto('.page__taxonomy strong', [['Categories:', 'Categorie:']]);
+    traduciTesto('.page__date strong', [['Updated:', 'Aggiornato:']]);
+
+    // Previous / Next (paginazione articolo)
+    document.querySelectorAll('.pagination--pager').forEach(function(a){
+      var t = a.textContent.trim();
+      if (t === 'Previous') a.textContent = 'Precedente';
+      if (t === 'Next') a.textContent = 'Successivo';
+    });
+
+    // Share on (titolo box condivisione)
+    document.querySelectorAll('.page__share-title').forEach(function(el){
+      if (el.textContent.trim() === 'Share on') el.textContent = 'Condividi su';
+    });
+
+    // Toggle search / Toggle menu (aria/testo nascosto accessibilita')
+    document.querySelectorAll('.visually-hidden').forEach(function(el){
+      var t = el.textContent.trim();
+      if (t === 'Toggle search') el.textContent = 'Attiva ricerca';
+      if (t === 'Toggle menu') el.textContent = 'Attiva menu';
+    });
+
+    // Enter your search term...
+    var searchInput = document.getElementById('search');
+    if (searchInput) {
+      searchInput.placeholder = 'Scrivi il termine da cercare...';
+      var searchLabel = document.querySelector('label[for="search"]');
+      if (searchLabel) searchLabel.textContent = 'Scrivi il termine da cercare...';
+    }
+
+    // You May Also Enjoy (sezione articoli correlati)
+    document.querySelectorAll('.page__related-title').forEach(function(el){
+      if (el.textContent.trim() === 'You May Also Enjoy') el.textContent = 'Potrebbe interessarti anche';
+    });
+
+    // Follow (bio autore sidebar) / Website (link social generico)
+    document.querySelectorAll('.author__urls-wrapper .btn').forEach(function(el){
+      if (el.textContent.trim() === 'Follow') el.textContent = 'Segui';
+    });
+    document.querySelectorAll('.author__urls .label').forEach(function(el){
+      if (el.textContent.trim() === 'Website') el.textContent = 'Sito web';
+    });
+
+    // Powered by Jekyll & Minimal Mistakes (footer copyright)
+    var footerCopy = document.querySelector('.page__footer-copyright');
+    if (footerCopy) {
+      footerCopy.childNodes.forEach(function(node){
+        if (node.nodeType === 3 && node.textContent.indexOf('Powered by') !== -1) {
+          node.textContent = node.textContent.replace('Powered by', 'Realizzato con');
+        }
+      });
+    }
+  })();
+
+  // --- INDICE AUTOMATICO generato dagli h2 dell'articolo, stile Wikipedia (2026-07-04) ---
+  (function(){
+    var content = document.querySelector('.page__content');
+    if (!content) return;
+    var headings = content.querySelectorAll('h2');
+    if (headings.length < 2) return; // sotto le 2 sezioni un indice non serve
+
+    var toc = document.createElement('div');
+    toc.className = 'article-auto-toc';
+    var title = document.createElement('div');
+    title.className = 'article-auto-toc__title';
+    title.textContent = 'Indice';
+    toc.appendChild(title);
+
+    var ol = document.createElement('ol');
+    headings.forEach(function(h, i){
+      if (!h.id) {
+        h.id = 'sez-' + (i + 1) + '-' + h.textContent.trim().toLowerCase()
+          .replace(/[^a-z0-9\s-]/g, '')
+          .replace(/\s+/g, '-')
+          .substring(0, 50);
+      }
+      var li = document.createElement('li');
+      var a = document.createElement('a');
+      a.href = '#' + h.id;
+      a.textContent = h.textContent.trim();
+      li.appendChild(a);
+      ol.appendChild(li);
+    });
+    toc.appendChild(ol);
+
+    // Inserisce l'indice subito dopo il primo h2 (cosi' il paragrafo introduttivo resta sopra, come Wikipedia)
+    var firstH2 = headings[0];
+    firstH2.parentNode.insertBefore(toc, firstH2);
+  })();
+
+  // --- DROPDOWN AUTOMATICO menu top per voci con sotto-menu (2026-09-10) ---
+  (function(){
+    var items = document.querySelectorAll('.masthead__menu-item.has-cp3-children');
+    items.forEach(function(li){
+      var toggle = li.querySelector('.cp3-submenu-toggle');
+      if (!toggle) return;
+      toggle.addEventListener('click', function(e){
+        e.preventDefault();
+        e.stopPropagation();
+        var isOpen = li.classList.contains('cp3-open');
+        items.forEach(function(other){ other.classList.remove('cp3-open'); other.querySelector('.cp3-submenu-toggle').setAttribute('aria-expanded','false'); });
+        if (!isOpen) {
+          li.classList.add('cp3-open');
+          toggle.setAttribute('aria-expanded','true');
+        }
+      });
+    });
+    document.addEventListener('click', function(e){
+      items.forEach(function(li){
+        if (!li.contains(e.target)) {
+          li.classList.remove('cp3-open');
+          var t = li.querySelector('.cp3-submenu-toggle');
+          if (t) t.setAttribute('aria-expanded','false');
+        }
+      });
+    });
+  })();
+
+  // --- DROPDOWN SHOP (generato da _data/shop_nav.yml via Liquid) ---
+  var shopCats = [{% for item in site.data.shop_nav.categories %}{"title":"{{ item.title }}","url":"{{ item.url }}"}{% unless forloop.last %},{% endunless %}{% endfor %}];
+  var shopFeatured = [{% for item in site.data.shop_nav.featured %}{"title":"{{ item.title }}","url":"{{ item.url }}"}{% unless forloop.last %},{% endunless %}{% endfor %}];
+
+  var links = document.querySelectorAll('.greedy-nav .visible-links a, .greedy-nav .hidden-links a');
+  links.forEach(function(a){
+    if(a.textContent.trim() === 'Shop'){
+      var li = a.parentElement;
+      li.classList.add('has-dropdown');
+      var catHTML = shopCats.map(function(i){ return '<a href="'+BASE+i.url+'">'+i.title+'</a>'; }).join('');
+      var featHTML = shopFeatured.length ? '<div class="dropdown-sep"></div><div class="dropdown-label">In evidenza</div>' + shopFeatured.map(function(i){ return '<a href="'+BASE+i.url+'">'+i.title+'</a>'; }).join('') : '';
+      li.innerHTML = '<a href="' + a.href + '">Shop</a>' +
+        '<div class="dropdown-menu">' +
+          '<div class="dropdown-label">Categorie</div>' +
+          catHTML + featHTML +
+        '</div>';
+    }
+  });
+});
+</script>
