@@ -329,7 +329,7 @@ document.addEventListener('DOMContentLoaded', function(){
     if (!catLink) return; // pagina senza categoria (es. prodotti)
     var span = document.createElement('span');
     span.className = 'page__meta-category';
-    span.innerHTML = ' · <a href="' + catLink.getAttribute('href') + '">' + catLink.textContent.trim() + '</a>';
+    span.innerHTML = ' · <a href="' + catLink.getAttribute('href') + '"><i class="fas fa-fw fa-folder" aria-hidden="true"></i> ' + catLink.textContent.trim() + '</a>';
     meta.appendChild(span);
   })();
 
