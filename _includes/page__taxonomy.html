@@ -1,3 +1,14 @@
+{% if site.category_archive.type and page.categories[0] %}
+  <p class="page__taxonomy">
+    <strong><i class="fas fa-fw fa-folder" aria-hidden="true"></i> {{ site.data.ui-text[site.locale].categories_label | default: "Categories:" }} </strong>
+    <span itemprop="keywords">
+    {% for category_word in page.categories %}
+      <a href="{{ category_word | slugify | prepend: '/categories/#' | relative_url }}" class="page__taxonomy-item" rel="tag">{{ category_word }}</a>{% unless forloop.last %}<span class="sep">, </span>{% endunless %}
+    {% endfor %}
+    </span>
+  </p>
+{% endif %}
+
 {% if site.tag_archive.type and page.tags[0] %}
   {% include tag-list.html %}
 {% endif %}
