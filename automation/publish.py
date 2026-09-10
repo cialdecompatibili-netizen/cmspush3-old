@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-publish.py - motore unico per pubblicare ARTICOLI e PRODOTTI su cmspush2 (Jekyll/GitHub Pages).
+publish.py - motore unico per pubblicare ARTICOLI e PRODOTTI (Jekyll/GitHub Pages).
 Uso da riga di comando o import. Fa slug, file .md, git add/commit/push automatico.
+Repo e URL sito sono in automation/config.json — cambia progetto senza toccare questo file.
 
 USO ARTICOLO:
     python publish.py articolo "Titolo Articolo" "categoria" "Excerpt breve." "Corpo markdown..."
@@ -23,8 +24,12 @@ import urllib.request
 import urllib.error
 from datetime import date, datetime
 
-REPO = r"C:\Users\mirco\Desktop\cmspush2"  # root del progetto
-SITE_BASE = "https://cialdecompatibili-netizen.github.io/cmspush2"
+_CONFIG_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "config.json")
+with open(_CONFIG_PATH, "r", encoding="utf-8") as _f:
+    _cfg = json.load(_f)
+
+REPO = _cfg["repo"]  # root del progetto — modificare in automation/config.json, non qui
+SITE_BASE = _cfg["site_base"]  # modificare in automation/config.json, non qui
 LOG_PATH = os.path.join(REPO, "automation", "publish_log.jsonl")
 
 
