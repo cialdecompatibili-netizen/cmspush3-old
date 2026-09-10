@@ -1,40 +1,64 @@
 <!--
-  sidebar.html - sidebar ad albero con categorie espandibili (freccetta)
-  Creato perché mancava dal repo (causava crash su single.html che la richiama
-  con {% include sidebar.html %}).
-  NON tocca il menu top originale (_data/navigation.yml).
-  <details>/<summary> nativi HTML: toggle senza bisogno di JS.
-  TEST: solo "Tecnica" ha sotto-voci (2 finte), per verificare che la freccetta
-  funzioni prima di replicare su tutte le categorie.
+  sidebar.html - sidebar ad albero, stile ispirato a Just the Docs
+  (bottone freccia separato dal link, animazione di rotazione fluida,
+  sottomenu con slide). NON tocca il menu top originale (navigation.yml).
+  TEST: solo "tecnica" ha sotto-voci (2 finte) per validare il toggle
+  prima di estenderlo a tutte le categorie.
 -->
 <style>
 .cp3-sidebar { font-size: 14px; margin: 20px 0; }
-.cp3-nav-list { list-style: none; margin: 0; padding: 0; }
-.cp3-nav-item { margin-bottom: 4px; }
-.cp3-nav-toggle {
-  cursor: pointer;
-  padding: 6px 8px;
-  border-radius: 6px;
-  font-weight: 600;
-  list-style: none;
+.cp3-nav-list, .cp3-nav-sublist { list-style: none; margin: 0; padding: 0; }
+.cp3-nav-item { position: relative; }
+
+.cp3-nav-row {
   display: flex;
   align-items: center;
-  gap: 6px;
+}
+.cp3-nav-link {
+  flex: 1;
+  display: block;
+  padding: 7px 8px;
   color: #333;
+  font-weight: 600;
+  text-decoration: none;
+  border-radius: 6px;
 }
-.cp3-nav-toggle::-webkit-details-marker { display: none; }
-.cp3-arrow {
-  display: inline-block;
-  font-size: 10px;
-  color: #999;
-  transition: transform .15s;
+.cp3-nav-link:hover { background: #f5f5ff; color: #6c63ff; }
+
+.cp3-nav-expander {
+  background: none;
+  border: none;
+  cursor: pointer;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  color: #888;
 }
-details[open] > .cp3-nav-toggle .cp3-arrow { transform: rotate(90deg); }
-.cp3-nav-toggle:hover { background: #f5f5ff; }
-.cp3-nav-sublist { list-style: none; margin: 2px 0 6px 22px; padding: 0; }
+.cp3-nav-expander:hover { background: #eee; }
+.cp3-nav-expander svg {
+  width: 12px;
+  height: 12px;
+  transition: transform .2s ease;
+}
+.cp3-nav-item.cp3-open > .cp3-nav-row .cp3-nav-expander svg {
+  transform: rotate(90deg);
+}
+
+.cp3-nav-sublist {
+  margin-left: 18px;
+  overflow: hidden;
+  max-height: 0;
+  transition: max-height .25s ease;
+}
+.cp3-nav-item.cp3-open > .cp3-nav-sublist {
+  max-height: 500px;
+}
 .cp3-nav-sublist li a {
   display: block;
-  padding: 5px 8px;
+  padding: 6px 8px;
   font-size: 13px;
   color: #666;
   text-decoration: none;
@@ -45,17 +69,39 @@ details[open] > .cp3-nav-toggle .cp3-arrow { transform: rotate(90deg); }
 
 <nav class="cp3-sidebar" aria-label="Categorie">
   <ul class="cp3-nav-list">
-    <li class="cp3-nav-item cp3-has-children">
-      <details open>
-        <summary class="cp3-nav-toggle">
-          <span class="cp3-arrow">&#9656;</span> Tecnica
-        </summary>
-        <ul class="cp3-nav-sublist">
-          <li><a href="{{ site.baseurl }}/categories/#tecnica">Tutti gli articoli</a></li>
-          <li><a href="{{ site.baseurl }}/categories/#tecnica">Guide (test)</a></li>
-          <li><a href="{{ site.baseurl }}/categories/#tecnica">Tutorial (test)</a></li>
-        </ul>
-      </details>
-    </li>
+    {% for cat in site.data.categorie %}
+      {% if cat.nome == "tecnica" %}
+        <li class="cp3-nav-item cp3-has-children cp3-open">
+          <div class="cp3-nav-row">
+            <a class="cp3-nav-link" href="{{ site.baseurl }}/categories/#{{ cat.nome }}">Tecnica</a>
+            <button class="cp3-nav-expander" type="button" aria-label="Espandi/comprimi">
+              <svg viewBox="0 0 16 16" fill="currentColor"><path d="M6 3l5 5-5 5V3z"/></svg>
+            </button>
+          </div>
+          <ul class="cp3-nav-sublist">
+            <li><a href="{{ site.baseurl }}/categories/#tecnica">Guide (test)</a></li>
+            <li><a href="{{ site.baseurl }}/categories/#tecnica">Tutorial (test)</a></li>
+          </ul>
+        </li>
+      {% else %}
+        <li class="cp3-nav-item">
+          <div class="cp3-nav-row">
+            <a class="cp3-nav-link" href="{{ site.baseurl }}/categories/#{{ cat.nome }}">{{ cat.nome | capitalize }}</a>
+          </div>
+        </li>
+      {% endif %}
+    {% endfor %}
   </ul>
 </nav>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  document.querySelectorAll('.cp3-nav-expander').forEach(function (btn) {
+    btn.addEventListener('click', function (e) {
+      e.preventDefault();
+      var item = btn.closest('.cp3-nav-item');
+      item.classList.toggle('cp3-open');
+    });
+  });
+});
+</script>
