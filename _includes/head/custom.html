@@ -338,13 +338,15 @@ document.addEventListener('DOMContentLoaded', function(){
     var rt = document.querySelector('.page__meta-readtime');
     if (!rt) return;
     var testo = rt.textContent;
-    var match = testo.match(/(\d+)\s*minute read/i);
-    if (match) {
-      var n = parseInt(match[1], 10);
-      var nuovoTesto = n === 1 ? '1 minuto di lettura' : n + ' minuti di lettura';
-      testo = testo.replace(/\d+\s*minute read/i, nuovoTesto);
-    } else if (/less than 1 minute read/i.test(testo)) {
+    if (/less than 1 minute read/i.test(testo)) {
       testo = testo.replace(/less than 1 minute read/i, 'meno di 1 minuto di lettura');
+    } else {
+      var match = testo.match(/(\d+)\s*minute read/i);
+      if (match) {
+        var n = parseInt(match[1], 10);
+        var nuovoTesto = n === 1 ? '1 minuto di lettura' : n + ' minuti di lettura';
+        testo = testo.replace(/\d+\s*minute read/i, nuovoTesto);
+      }
     }
     var icon = rt.querySelector('i');
     rt.textContent = testo.trim();
