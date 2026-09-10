@@ -1,11 +1,11 @@
 related_posts: 3
-title: CMSPush2
-baseurl: "/cmspush2"
+title: CMSPush3
+baseurl: "/cmspush3"
 url: "https://cialdecompatibili-netizen.github.io"
 email: ""
 description: >-
   Un sito Jekyll con CMS integrato, gestito da CMSPush.
-footer_text: "&copy; 2026 CMSPush2"
+footer_text: "&copy; 2026 CMSPush3"
 twitter_username: username
 github_username: username
 minimal_mistakes_skin: default
