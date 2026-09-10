@@ -5,6 +5,13 @@ main:
     url: /#pricing
   - title: "Blog"
     url: /blog/
+    children:
+      - title: "Tecnica"
+        url: /categories/#tecnica
+      - title: "Fashion"
+        url: /categories/#fashion
+      - title: "Mauritius"
+        url: /categories/#mauritius
   - title: "Shop"
     url: /shop/
   - title: "About"
