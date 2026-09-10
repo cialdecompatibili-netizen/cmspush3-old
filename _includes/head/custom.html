@@ -54,45 +54,6 @@ body { font-size: calc(1rem * var(--t-font-scale)); }
   right: -2px;
 }
 
-/* DROPDOWN SHOP */
-.has-dropdown { position: relative; }
-.has-dropdown > a::after { content: " ▾"; font-size: 10px; opacity: .6; }
-.dropdown-menu {
-  display: none;
-  position: absolute;
-  top: 100%;
-  left: 0;
-  background: #fff;
-  border: 1.5px solid #eee;
-  border-radius: 8px;
-  box-shadow: 0 8px 24px rgba(0,0,0,.10);
-  min-width: 220px;
-  z-index: 9999;
-  padding: 6px 0;
-}
-.has-dropdown:hover .dropdown-menu { display: block; }
-.dropdown-menu a {
-  display: block;
-  padding: 8px 16px;
-  font-size: 13px;
-  color: #333 !important;
-  text-decoration: none;
-  white-space: nowrap;
-}
-.dropdown-menu a:hover { background: #f5f5ff; color: #6c63ff !important; }
-.dropdown-menu .dropdown-sep {
-  border-top: 1px solid #eee;
-  margin: 4px 0;
-}
-.dropdown-menu .dropdown-label {
-  padding: 6px 16px 2px;
-  font-size: 10px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: .8px;
-  color: #bbb;
-}
-
 /* BOTTONE TORNA SU */
 #back-to-top-btn {
   position: fixed;
@@ -220,6 +181,19 @@ body { font-size: calc(1rem * var(--t-font-scale)); }
   white-space: nowrap;
 }
 .cp3-submenu a:hover { background: #f5f5ff; color: var(--t-accent, #6c63ff) !important; }
+
+/* Menu mobile (hidden-links, greedy-nav) — submenu impilato verticale, niente position:absolute */
+.hidden-links .masthead__menu-item.has-cp3-children { position: static; display: block; }
+.hidden-links .cp3-submenu {
+  position: static;
+  box-shadow: none;
+  border: none;
+  border-left: 2px solid #eee;
+  border-radius: 0;
+  margin: 0 0 0 12px;
+  padding: 0;
+}
+.hidden-links .masthead__menu-item.has-cp3-children.cp3-open .cp3-submenu { display: block; }
 </style>
 
 {% if site.integrations.ga4.enabled and site.integrations.ga4.id != "" %}
@@ -497,24 +471,29 @@ document.addEventListener('DOMContentLoaded', function(){
   })();
 
   // --- DROPDOWN AUTOMATICO menu top per voci con sotto-menu (2026-09-10) ---
+  // Event delegation su document: funziona anche sui <li> clonati dal greedy-nav in .hidden-links
   (function(){
-    var items = document.querySelectorAll('.masthead__menu-item.has-cp3-children');
-    items.forEach(function(li){
-      var toggle = li.querySelector('.cp3-submenu-toggle');
-      if (!toggle) return;
-      toggle.addEventListener('click', function(e){
+    document.addEventListener('click', function(e){
+      var toggle = e.target.closest('.cp3-submenu-toggle');
+      var allItems = document.querySelectorAll('.masthead__menu-item.has-cp3-children');
+      if (toggle) {
         e.preventDefault();
         e.stopPropagation();
+        var li = toggle.closest('.masthead__menu-item.has-cp3-children');
         var isOpen = li.classList.contains('cp3-open');
-        items.forEach(function(other){ other.classList.remove('cp3-open'); other.querySelector('.cp3-submenu-toggle').setAttribute('aria-expanded','false'); });
+        allItems.forEach(function(other){
+          other.classList.remove('cp3-open');
+          var t = other.querySelector('.cp3-submenu-toggle');
+          if (t) t.setAttribute('aria-expanded','false');
+        });
         if (!isOpen) {
           li.classList.add('cp3-open');
           toggle.setAttribute('aria-expanded','true');
         }
-      });
-    });
-    document.addEventListener('click', function(e){
-      items.forEach(function(li){
+        return;
+      }
+      // click fuori: chiudi tutto
+      allItems.forEach(function(li){
         if (!li.contains(e.target)) {
           li.classList.remove('cp3-open');
           var t = li.querySelector('.cp3-submenu-toggle');
@@ -524,23 +503,5 @@ document.addEventListener('DOMContentLoaded', function(){
     });
   })();
 
-  // --- DROPDOWN SHOP (generato da _data/shop_nav.yml via Liquid) ---
-  var shopCats = [{% for item in site.data.shop_nav.categories %}{"title":"{{ item.title }}","url":"{{ item.url }}"}{% unless forloop.last %},{% endunless %}{% endfor %}];
-  var shopFeatured = [{% for item in site.data.shop_nav.featured %}{"title":"{{ item.title }}","url":"{{ item.url }}"}{% unless forloop.last %},{% endunless %}{% endfor %}];
-
-  var links = document.querySelectorAll('.greedy-nav .visible-links a, .greedy-nav .hidden-links a');
-  links.forEach(function(a){
-    if(a.textContent.trim() === 'Shop'){
-      var li = a.parentElement;
-      li.classList.add('has-dropdown');
-      var catHTML = shopCats.map(function(i){ return '<a href="'+BASE+i.url+'">'+i.title+'</a>'; }).join('');
-      var featHTML = shopFeatured.length ? '<div class="dropdown-sep"></div><div class="dropdown-label">In evidenza</div>' + shopFeatured.map(function(i){ return '<a href="'+BASE+i.url+'">'+i.title+'</a>'; }).join('') : '';
-      li.innerHTML = '<a href="' + a.href + '">Shop</a>' +
-        '<div class="dropdown-menu">' +
-          '<div class="dropdown-label">Categorie</div>' +
-          catHTML + featHTML +
-        '</div>';
-    }
-  });
 });
 </script>

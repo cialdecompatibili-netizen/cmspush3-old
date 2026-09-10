@@ -14,6 +14,13 @@ main:
         url: /categories/#mauritius
   - title: "Shop"
     url: /shop/
+    children:
+      - title: "📦 Tutti i prodotti"
+        url: /shop/
+      - title: "👕 Abbigliamento"
+        url: /shop/categoria/abbigliamento/
+      - title: "🛒 Maglietta Dr. Sorriso"
+        url: /shop/maglietta-dr-sorriso/
   - title: "About"
     url: /about/
   - title: "Changelog"
